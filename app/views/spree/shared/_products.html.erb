@@ -1,0 +1,100 @@
+<%
+  paginated_products = @searcher.retrieve_products if params.key?(:keywords)
+  paginated_products ||= products
+%>
+
+<% content_for :head do %>
+  <% if paginated_products.respond_to?(:num_pages) %>
+    <%= rel_next_prev_link_tags paginated_products %>
+  <% end %>
+<% end %>
+
+<!-- Product search result div -->
+<div data-hook="products_search_results_heading">
+  <% if products.empty? %>
+    <div data-hook="products_search_results_heading_no_results_found">
+      <%= Spree.t(:no_products_found) %>
+    </div>
+  <% elsif params.key?(:keywords) %>
+    <div data-hook="products_search_results_heading_results_found">
+      <h6 class="search-results-title"><%= Spree.t(:search_results, keywords: h(params[:keywords])) %></h6>
+    </div>
+  <% end %>
+</div>
+<!-- End : Product search result div -->
+<div class="container">
+  <div class="row container-gallery">
+    <!-- Begin - Sidebar -->
+    <div class="col-md-3 col-sm-6 col-xs-12">
+      <div class="post-container">
+        <div class="post-desc">
+          <h2>Find Your Favorite Image, Video, and Other With Fransisca Gallery.</h2>
+          <a href="#" class="btn btn-default btn-sm">Learn More &rarr;</a>
+        </div>
+        <div class="sidebar-menu">
+          <ul class="nav nav-pills nav-stacked">
+            <li class="active"><a href="#"><i class="fa fa-clock-o"></i> Newest</a></li>
+            <li><a href="#"><i class="fa fa-upload"></i> Upload Picture</a></li>
+            
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- End - Sidebar -->
+
+    <!-- Begin - Content -->
+  <% if products.any? %><!-- Begin - Prodcuts check if -->
+     <% products.each do |product| %> <!-- Begin - Products Loop -->
+      <% url = spree.product_url(product, taxon_id: @taxon.try(:id)) %>
+
+      <div  id="product_<%= product.id %>" class="col-md-3 col-sm-6 col-xs-12" data-hook="products_list_item" itemscope itemtype="https://schema.org/Product"><!-- Begin - product -->
+
+        <% cache(@taxon.present? ? [I18n.locale, current_currency, @taxon, product] : [I18n.locale, current_currency, product]) do %><!-- Begin - Cache loop -->
+
+            <div class="post-container">
+              <div class="post-option">
+                <ul class="list-options">
+                  <li><a href="detail.html"><i class="fa fa-plus"></i> <span>Detail</span></a></li>
+                  <li><a href="#"><i class="fa fa-comment"></i> <span>Comment</span></a></li>
+                  <li><a href="#"><i class="fa fa-cloud-download"></i> <span>Download</span></a></li>
+                  <li><a href="#"><i class="fa fa-heart"></i> <span>Love</span></a></li>
+                </ul>
+              </div>
+              <div class="post-image">
+                <%= link_to small_image(product, itemprop: "image"), url, itemprop: 'url' %><br/>
+              </div>
+              <div class="post-meta">
+                <ul class="list-meta list-inline">
+                  <li><i class="fa fa-eye"></i> 117</li>
+                  <li><i class="fa fa-comment"></i> 7</li>
+                  <li><i class="fa fa-cloud-download"></i> 8</li>
+                  <li><i class="fa fa-heart"></i> 9</li>
+                </ul>
+              </div>
+              <div class="post-desc">
+                <i class="fa fa-tags"></i> Tags : <a href="#">Tower</a>, <a href="#">City</a>, <a href="#">Building</a>
+              </div>
+            </div>
+
+        <% end %><!-- End Cache Loop -->
+      </div><!-- End - Product -->
+      <% reset_cycle("classes") %>
+      <% end %><!-- End - Prodcuts check if -->
+  <% end %><!-- End - Prodcuts check if -->
+    <!-- End Content -->
+
+    <!-- begin:pagination -->
+    <div class="col-md-12">
+      <ul class="pagination">
+        <% if paginated_products.respond_to?(:num_pages) %>
+          <%= paginate paginated_products, theme: 'twitter-bootstrap-3' %>
+        <% end %>
+      </ul>
+    </div>
+    <!-- end:pagination -->
+  </div>
+</div>
+
+
+
+
